@@ -18,10 +18,8 @@ export function CampaignCategoryCard({ category }: CampaignCategoryCardProps) {
           <div>
             <h3 className="font-medium text-white">
               <Link href={`/categories/${encodeURIComponent(category.name)}`}>
-                <a>
-                  <span className="absolute inset-0"></span>
-                  {category.name}
-                </a>
+                <span className="absolute inset-0"></span>
+                {category.name}
               </Link>
             </h3>
             <p className="mt-1 text-sm text-white">{category.campaignCount} projects</p>

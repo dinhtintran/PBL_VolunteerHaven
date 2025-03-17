@@ -10,6 +10,7 @@ import CampaignDetails from "@/pages/campaign-details";
 import DashboardPage from "@/pages/dashboard-page";
 import OrganizationPage from "@/pages/organization-page";
 import CreateCampaign from "@/pages/create-campaign";
+import AdminPage from "@/pages/admin-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/organizations/:id" component={OrganizationPage} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/create-campaign" component={CreateCampaign} />
+      <ProtectedRoute path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );
