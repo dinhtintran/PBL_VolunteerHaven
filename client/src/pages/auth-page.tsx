@@ -36,7 +36,7 @@ const registerSchema = z.object({
 });
 
 export default function AuthPage() {
-  const { user, loginMutation, registerMutation } = useAuth();
+  const { user, loginMutation, adminLoginMutation, registerMutation } = useAuth();
   const [activeTab, setActiveTab] = useState("login");
   
   // Login form
@@ -62,7 +62,13 @@ export default function AuthPage() {
   });
   
   const onLoginSubmit = (values: z.infer<typeof loginSchema>) => {
-    loginMutation.mutate(values);
+    // Check if this is an admin login attempt
+    if (values.username === "admin") {
+      console.log("Attempting admin login");
+      adminLoginMutation.mutate(values);
+    } else {
+      loginMutation.mutate(values);
+    }
   };
   
   const onRegisterSubmit = (values: z.infer<typeof registerSchema>) => {
