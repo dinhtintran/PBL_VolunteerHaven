@@ -75,8 +75,13 @@ export default function AuthPage() {
     registerMutation.mutate(values);
   };
   
-  // Redirect to home if user is already logged in
+  // Redirect based on user type
   if (user) {
+    // Redirect admin to admin dashboard
+    if (user.userType === "admin") {
+      return <Redirect to="/admin" />;
+    }
+    // Redirect regular users to home
     return <Redirect to="/" />;
   }
   
@@ -113,9 +118,26 @@ export default function AuthPage() {
                             <FormItem>
                               <FormLabel>Username</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter your username" {...field} />
+                                <Input 
+                                  placeholder="Enter your username" 
+                                  {...field} 
+                                  onChange={(e) => {
+                                    field.onChange(e);
+                                    // Highlight admin login attempt
+                                    if (e.target.value === "admin") {
+                                      e.target.style.borderColor = "#10B981";
+                                    } else {
+                                      e.target.style.borderColor = "";
+                                    }
+                                  }}
+                                />
                               </FormControl>
                               <FormMessage />
+                              {field.value === "admin" && (
+                                <div className="text-xs text-green-600 mt-1">
+                                  Admin login mode activated. Use password: admin123
+                                </div>
+                              )}
                             </FormItem>
                           )}
                         />
@@ -135,14 +157,16 @@ export default function AuthPage() {
                         <Button 
                           type="submit" 
                           className="w-full" 
-                          disabled={loginMutation.isPending}
+                          disabled={loginMutation.isPending || adminLoginMutation.isPending}
                         >
-                          {loginMutation.isPending ? "Signing in..." : "Sign In"}
+                          {loginMutation.isPending || adminLoginMutation.isPending 
+                            ? "Signing in..." 
+                            : "Sign In"}
                         </Button>
                       </form>
                     </Form>
                   </CardContent>
-                  <CardFooter className="flex flex-col items-center">
+                  <CardFooter className="flex flex-col items-center space-y-2">
                     <div className="text-sm text-gray-500">
                       Don't have an account?{" "}
                       <button
@@ -150,6 +174,18 @@ export default function AuthPage() {
                         onClick={() => setActiveTab("register")}
                       >
                         Sign up
+                      </button>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      <button
+                        type="button"
+                        className="text-green-600 hover:underline"
+                        onClick={() => {
+                          loginForm.setValue("username", "admin");
+                          loginForm.setValue("password", "admin123");
+                        }}
+                      >
+                        Admin Portal Access
                       </button>
                     </div>
                   </CardFooter>
