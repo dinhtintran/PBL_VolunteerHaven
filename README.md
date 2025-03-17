@@ -134,9 +134,3 @@ Dự án này xây dựng một nền tảng web giúp:
 
 ## Tài khoản demo
 - **Admin**: username: admin, password: admin123
-- **Tổ chức**: username: charity1, password: password123
-- **Người dùng**: username: donor1, password: password123
-
-## Giấy phép
-
-Dự án này được phát hành dưới giấy phép MIT.
