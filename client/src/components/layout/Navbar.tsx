@@ -56,6 +56,11 @@ export function Navbar() {
                 <Link href="/dashboard">
                   <Button variant="outline" size="sm">Dashboard</Button>
                 </Link>
+                {user.userType === "admin" && (
+                  <Link href="/admin">
+                    <Button variant="outline" size="sm">Admin Panel</Button>
+                  </Link>
+                )}
                 <Button variant="ghost" size="sm" onClick={handleLogout}>Logout</Button>
               </div>
             ) : (
@@ -118,6 +123,11 @@ export function Navbar() {
                   <Link href="/dashboard">
                     <Button className="w-full" variant="default">Dashboard</Button>
                   </Link>
+                  {user.userType === "admin" && (
+                    <Link href="/admin">
+                      <Button className="w-full" variant="default">Admin Panel</Button>
+                    </Link>
+                  )}
                   <Button className="w-full" variant="outline" onClick={handleLogout}>
                     Logout
                   </Button>

@@ -28,21 +28,17 @@ export function OrganizationCard({ organization, raisedAmount = 0 }: Organizatio
       </div>
       <div className="flex-1 bg-white p-6 flex flex-col justify-between">
         <div className="flex-1">
-          <Link href={`/organizations/${organization.id}`}>
-            <a className="block">
-              <p className="text-xl font-semibold text-gray-900">{organization.fullName}</p>
-              <p className="mt-1 text-base text-gray-500">{organization.bio || "Organization Leader"}</p>
-            </a>
+          <Link href={`/organizations/${organization.id}`} className="block">
+            <p className="text-xl font-semibold text-gray-900">{organization.fullName}</p>
+            <p className="mt-1 text-base text-gray-500">{organization.bio || "Organization Leader"}</p>
           </Link>
           <p className="mt-3 text-base text-gray-500">
             Has raised {formatCurrency(raisedAmount)}
           </p>
         </div>
         <div className="mt-6">
-          <Link href={`/organizations/${organization.id}`}>
-            <a className="text-primary hover:text-blue-600">
-              View Details <span aria-hidden="true">→</span>
-            </a>
+          <Link href={`/organizations/${organization.id}`} className="text-primary hover:text-blue-600">
+            View Details <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>
