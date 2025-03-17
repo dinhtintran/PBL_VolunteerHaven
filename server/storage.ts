@@ -203,6 +203,41 @@ export class MemStorage implements IStorage {
     const categories = Array.from(this.categories.values());
     if (categories.length === 0) return;
     
+    // Add a pending campaign for testing
+    const pendingCampaign = {
+      title: "Pending Approval: School Construction Project",
+      description: "This campaign aims to build a new school in an underserved area. We need funding to purchase construction materials and pay for labor costs. The school will serve approximately 500 children who currently have to travel very long distances to attend classes.\n\nPlease help us create a better educational environment for these deserving children.",
+      goalAmount: 150000,
+      currentAmount: 0,
+      category: "Education",
+      imageUrl: "https://images.unsplash.com/photo-1594608661623-aa0bd3a69a98",
+      isActive: true,
+      isApproved: false
+    };
+    
+    const pendingId = this.campaignIdCounter++;
+    const org = organizations[0];
+    const startDate = new Date();
+    const endDate = new Date(startDate.getTime() + 120 * 24 * 60 * 60 * 1000);
+    
+    this.campaigns.set(pendingId, {
+      ...pendingCampaign,
+      id: pendingId,
+      organizationId: org.id,
+      startDate,
+      endDate,
+      createdAt: startDate
+    });
+    
+    // Update category count
+    const pendingCategory = categories.find(c => c.name === pendingCampaign.category);
+    if (pendingCategory) {
+      this.categories.set(pendingCategory.id, {
+        ...pendingCategory,
+        campaignCount: pendingCategory.campaignCount + 1
+      });
+    }
+    
     const campaigns = [
       {
         title: "Build literacy points for mountain children",
@@ -272,7 +307,8 @@ export class MemStorage implements IStorage {
         organizationId: org.id,
         startDate,
         endDate,
-        createdAt: startDate
+        createdAt: startDate,
+        isApproved: true  // Default approved for sample campaigns
       });
     });
   }
@@ -336,6 +372,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values()).find(
       (user) => user.email === email,
     );
+  }
+  
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
