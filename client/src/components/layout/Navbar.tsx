@@ -1,12 +1,15 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { Search, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { LanguageSwitcher } from "../language/LanguageSwitcher";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logoutMutation } = useAuth();
+  const { t } = useLanguage();
   const [location] = useLocation();
 
   const toggleMenu = () => {
@@ -32,16 +35,16 @@ export function Navbar() {
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link href="/" className={`${isActive('/') ? 'border-b-2 border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} px-1 pt-1 inline-flex items-center text-sm font-medium`}>
-                Home
+                {t('nav.home')}
               </Link>
               <Link href="/campaigns" className={`${isActive('/campaigns') ? 'border-b-2 border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} px-1 pt-1 inline-flex items-center text-sm font-medium`}>
-                Campaigns
+                {t('nav.campaigns')}
               </Link>
               <Link href="/about" className={`${isActive('/about') ? 'border-b-2 border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} px-1 pt-1 inline-flex items-center text-sm font-medium`}>
-                About
+                {t('nav.about')}
               </Link>
               <Link href="/contact" className={`${isActive('/contact') ? 'border-b-2 border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} px-1 pt-1 inline-flex items-center text-sm font-medium`}>
-                Contact
+                {t('nav.contact')}
               </Link>
             </div>
           </div>
@@ -95,26 +98,26 @@ export function Navbar() {
       {isMenuOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
-            <Link href="/">
-              <a className={`${isActive('/') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'} block pl-3 pr-4 py-2 text-base font-medium`}>
-                Home
-              </a>
-            </Link>
-            <Link href="/campaigns">
-              <a className={`${isActive('/campaigns') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'} block pl-3 pr-4 py-2 text-base font-medium`}>
-                Campaigns
-              </a>
-            </Link>
-            <Link href="/about">
-              <a className={`${isActive('/about') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'} block pl-3 pr-4 py-2 text-base font-medium`}>
-                About
-              </a>
-            </Link>
-            <Link href="/contact">
-              <a className={`${isActive('/contact') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'} block pl-3 pr-4 py-2 text-base font-medium`}>
-                Contact
-              </a>
-            </Link>
+            <div>
+              <Link href="/" className={`${isActive('/') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'} block pl-3 pr-4 py-2 text-base font-medium`}>
+                {t('nav.home')}
+              </Link>
+            </div>
+            <div>
+              <Link href="/campaigns" className={`${isActive('/campaigns') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'} block pl-3 pr-4 py-2 text-base font-medium`}>
+                {t('nav.campaigns')}
+              </Link>
+            </div>
+            <div>
+              <Link href="/about" className={`${isActive('/about') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'} block pl-3 pr-4 py-2 text-base font-medium`}>
+                {t('nav.about')}
+              </Link>
+            </div>
+            <div>
+              <Link href="/contact" className={`${isActive('/contact') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'} block pl-3 pr-4 py-2 text-base font-medium`}>
+                {t('nav.contact')}
+              </Link>
+            </div>
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200">
             <div className="flex items-center px-4">
