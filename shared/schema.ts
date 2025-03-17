@@ -9,9 +9,11 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
   fullName: text("full_name").notNull(),
-  userType: text("user_type").notNull().default("donor"), // donor or organization
+  userType: text("user_type").notNull().default("donor"), // donor, organization, or admin
   bio: text("bio"),
   profileImage: text("profile_image"),
+  isApproved: boolean("is_approved").default(false), // For organizations
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -33,6 +35,7 @@ export const campaigns = pgTable("campaigns", {
   startDate: timestamp("start_date").notNull().defaultNow(),
   endDate: timestamp("end_date"),
   isActive: boolean("is_active").notNull().default(true),
+  isApproved: boolean("is_approved").default(false), // Admin approval status
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -40,6 +43,7 @@ export const insertCampaignSchema = createInsertSchema(campaigns).omit({
   id: true,
   currentAmount: true,
   createdAt: true,
+  isApproved: true,
 });
 
 // Donation schema
