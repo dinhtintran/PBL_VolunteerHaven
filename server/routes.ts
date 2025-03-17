@@ -262,6 +262,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ADMIN ROUTES
+  // Middleware to check if user is admin
+  const isAdmin = (req: any, res: any, next: any) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "You must be logged in" });
+    }
+    
+    if (req.user.userType !== "admin") {
+      return res.status(403).json({ message: "You must be an admin to access this resource" });
+    }
+    
+    next();
+  };
+
+  // Get all organizations for admin
+  app.get("/api/admin/organizations", isAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching organizations" });
+    }
+  });
+
+  // Get pending campaigns for admin
+  app.get("/api/admin/campaigns/pending", isAdmin, async (req, res) => {
+    try {
+      const campaigns = await storage.getPendingCampaigns();
+      res.json(campaigns);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching pending campaigns" });
+    }
+  });
+
+  // Approve organization
+  app.patch("/api/admin/organizations/:id/approve", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+      
+      if (user.userType !== "organization") {
+        return res.status(400).json({ message: "User is not an organization" });
+      }
+      
+      const updatedUser = await storage.updateUser(id, { isApproved: true });
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ message: "Error approving organization" });
+    }
+  });
+
+  // Reject organization
+  app.patch("/api/admin/organizations/:id/reject", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+      
+      if (user.userType !== "organization") {
+        return res.status(400).json({ message: "User is not an organization" });
+      }
+      
+      const updatedUser = await storage.updateUser(id, { isApproved: false });
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ message: "Error rejecting organization" });
+    }
+  });
+
+  // Approve campaign
+  app.patch("/api/admin/campaigns/:id/approve", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const campaign = await storage.getCampaign(id);
+      
+      if (!campaign) {
+        return res.status(404).json({ message: "Campaign not found" });
+      }
+      
+      const updatedCampaign = await storage.updateCampaign(id, { isApproved: true });
+      res.json(updatedCampaign);
+    } catch (error) {
+      res.status(500).json({ message: "Error approving campaign" });
+    }
+  });
+
+  // Reject campaign
+  app.patch("/api/admin/campaigns/:id/reject", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const campaign = await storage.getCampaign(id);
+      
+      if (!campaign) {
+        return res.status(404).json({ message: "Campaign not found" });
+      }
+      
+      const updatedCampaign = await storage.updateCampaign(id, { isApproved: false, isActive: false });
+      res.json(updatedCampaign);
+    } catch (error) {
+      res.status(500).json({ message: "Error rejecting campaign" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

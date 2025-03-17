@@ -13,6 +13,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>; // New method for admin
   
   // Campaign operations
   getCampaign(id: number): Promise<Campaign | undefined>;
@@ -20,6 +21,7 @@ export interface IStorage {
   getAllCampaigns(): Promise<Campaign[]>;
   getFeaturedCampaigns(limit?: number): Promise<Campaign[]>;
   getCampaignsByCategory(category: string): Promise<Campaign[]>;
+  getPendingCampaigns(): Promise<Campaign[]>; // New method for admin
   createCampaign(campaign: InsertCampaign): Promise<Campaign>;
   updateCampaign(id: number, campaign: Partial<Campaign>): Promise<Campaign | undefined>;
   deleteCampaign(id: number): Promise<boolean>;
@@ -370,9 +372,14 @@ export class MemStorage implements IStorage {
   
   async getFeaturedCampaigns(limit: number = 3): Promise<Campaign[]> {
     return Array.from(this.campaigns.values())
-      .filter(campaign => campaign.isActive)
+      .filter(campaign => campaign.isActive && campaign.isApproved)
       .sort(() => 0.5 - Math.random())
       .slice(0, limit);
+  }
+  
+  async getPendingCampaigns(): Promise<Campaign[]> {
+    return Array.from(this.campaigns.values())
+      .filter(campaign => campaign.isApproved === false || campaign.isApproved === null);
   }
   
   async getCampaignsByCategory(category: string): Promise<Campaign[]> {
