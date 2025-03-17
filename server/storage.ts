@@ -104,13 +104,16 @@ export class MemStorage implements IStorage {
     const adminUser = {
       id: this.userIdCounter++,
       username: "admin",
-      password: "$2b$10$3euPcmQFCiblsZeEu5s7p.9MQNCMfpO5v0xW.0GXZxk5nQBghU3/e", // "admin123"
+      // Use the same format as our auth.ts hashPassword function: hash.salt
+      password: "5d5c7f2813004877fd152d8b6ecc42b0ce20811b6a4d387811ca6ec0e3c8ed51ff2c92ca615b7a06f622fe087dc5c07c2703aa984d4e345afb93b4f390961f2b.96b30e4f2f5c53af45aec6c8",
       email: "admin@givehope.org",
       fullName: "System Administrator",
       userType: "admin",
       bio: "System Administrator with full access",
       profileImage: "https://ui-avatars.com/api/?name=System+Administrator&background=0D8ABC&color=fff",
-      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 days ago
+      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+      isApproved: true,
+      isActive: true
     };
     this.users.set(adminUser.id, adminUser);
     
@@ -118,13 +121,14 @@ export class MemStorage implements IStorage {
     const organizations = [
       {
         username: "childrenfund",
-        password: "$2b$10$3euPcmQFCiblsZeEu5s7p.9MQNCMfpO5v0xW.0GXZxk5nQBghU3/e", // "admin123"
+        password: "5d5c7f2813004877fd152d8b6ecc42b0ce20811b6a4d387811ca6ec0e3c8ed51ff2c92ca615b7a06f622fe087dc5c07c2703aa984d4e345afb93b4f390961f2b.96b30e4f2f5c53af45aec6c8", // "admin123"
         email: "info@childrenfund.org",
         fullName: "Children's Hope Foundation",
         userType: "organization",
         bio: "Supporting children in need across the world",
         profileImage: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c",
-        isApproved: true
+        isApproved: true,
+        isActive: true
       },
       {
         username: "greenearthorg",
