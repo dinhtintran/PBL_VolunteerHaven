@@ -1,7 +1,7 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { useLanguage } from "@/hooks/use-language";
 
 // Login form schema
 const loginSchema = z.object({
@@ -38,6 +39,7 @@ const registerSchema = z.object({
 export default function AuthPage() {
   const { user, loginMutation, adminLoginMutation, registerMutation } = useAuth();
   const [activeTab, setActiveTab] = useState("login");
+  const { t } = useLanguage();
   
   // Login form
   const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -62,7 +64,6 @@ export default function AuthPage() {
   });
   
   const onLoginSubmit = (values: z.infer<typeof loginSchema>) => {
-    // Check if this is an admin login attempt
     if (values.username === "admin") {
       console.log("Attempting admin login");
       adminLoginMutation.mutate(values);
@@ -75,13 +76,10 @@ export default function AuthPage() {
     registerMutation.mutate(values);
   };
   
-  // Redirect based on user type
   if (user) {
-    // Redirect admin to admin dashboard
     if (user.userType === "admin") {
       return <Redirect to="/admin" />;
     }
-    // Redirect regular users to home
     return <Redirect to="/" />;
   }
   
@@ -90,22 +88,20 @@ export default function AuthPage() {
       <Navbar />
       
       <div className="flex-grow flex">
-        {/* Left side - Forms */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
           <div className="w-full max-w-md">
             <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2 mb-8">
-                <TabsTrigger value="login">Sign In</TabsTrigger>
-                <TabsTrigger value="register">Sign Up</TabsTrigger>
+                <TabsTrigger value="login">{t("auth.signin")}</TabsTrigger>
+                <TabsTrigger value="register">{t("auth.signup")}</TabsTrigger>
               </TabsList>
               
-              {/* Login Form */}
               <TabsContent value="login">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Sign In</CardTitle>
+                    <CardTitle>{t("auth.signin")}</CardTitle>
                     <CardDescription>
-                      Enter your credentials to access your account
+                      {t("auth.signin.description")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -116,14 +112,13 @@ export default function AuthPage() {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>{t("auth.username")}</FormLabel>
                               <FormControl>
                                 <Input 
-                                  placeholder="Enter your username" 
+                                  placeholder={t("auth.username")} 
                                   {...field} 
                                   onChange={(e) => {
                                     field.onChange(e);
-                                    // Highlight admin login attempt
                                     if (e.target.value === "admin") {
                                       e.target.style.borderColor = "#10B981";
                                     } else {
@@ -135,7 +130,7 @@ export default function AuthPage() {
                               <FormMessage />
                               {field.value === "admin" && (
                                 <div className="text-xs text-green-600 mt-1">
-                                  Admin login mode activated. Use password: admin123
+                                  {t("auth.admin.mode")}
                                 </div>
                               )}
                             </FormItem>
@@ -146,9 +141,9 @@ export default function AuthPage() {
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Password</FormLabel>
+                              <FormLabel>{t("auth.password")}</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="Enter your password" {...field} />
+                                <Input type="password" placeholder={t("auth.password")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -160,20 +155,20 @@ export default function AuthPage() {
                           disabled={loginMutation.isPending || adminLoginMutation.isPending}
                         >
                           {loginMutation.isPending || adminLoginMutation.isPending 
-                            ? "Signing in..." 
-                            : "Sign In"}
+                            ? t("auth.signin.loading")
+                            : t("auth.signin.button")}
                         </Button>
                       </form>
                     </Form>
                   </CardContent>
                   <CardFooter className="flex flex-col items-center space-y-2">
                     <div className="text-sm text-gray-500">
-                      Don't have an account?{" "}
+                      {t("auth.noaccount")}{" "}
                       <button
                         className="text-primary hover:underline"
                         onClick={() => setActiveTab("register")}
                       >
-                        Sign up
+                        {t("auth.signup")}
                       </button>
                     </div>
                     <div className="text-xs text-muted-foreground">
@@ -185,20 +180,19 @@ export default function AuthPage() {
                           loginForm.setValue("password", "admin123");
                         }}
                       >
-                        Admin Portal Access
+                        {t("auth.admin.portal")}
                       </button>
                     </div>
                   </CardFooter>
                 </Card>
               </TabsContent>
               
-              {/* Register Form */}
               <TabsContent value="register">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Create Account</CardTitle>
+                    <CardTitle>{t("auth.signup")}</CardTitle>
                     <CardDescription>
-                      Sign up for a new account
+                      {t("auth.signup.description")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -209,9 +203,9 @@ export default function AuthPage() {
                           name="fullName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Full Name</FormLabel>
+                              <FormLabel>{t("auth.fullname")}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter your full name" {...field} />
+                                <Input placeholder={t("auth.fullname")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -222,9 +216,9 @@ export default function AuthPage() {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>{t("auth.username")}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Choose a username" {...field} />
+                                <Input placeholder={t("auth.username")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -235,9 +229,9 @@ export default function AuthPage() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel>{t("auth.email")}</FormLabel>
                               <FormControl>
-                                <Input type="email" placeholder="Enter your email" {...field} />
+                                <Input type="email" placeholder={t("auth.email")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -248,19 +242,19 @@ export default function AuthPage() {
                           name="userType"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Account Type</FormLabel>
+                              <FormLabel>{t("auth.accountType")}</FormLabel>
                               <Select 
                                 onValueChange={field.onChange} 
                                 defaultValue={field.value}
                               >
                                 <FormControl>
                                   <SelectTrigger>
-                                    <SelectValue placeholder="Select account type" />
+                                    <SelectValue placeholder={t("auth.accountType")} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="donor">Donor</SelectItem>
-                                  <SelectItem value="organization">Organization</SelectItem>
+                                  <SelectItem value="donor">{t("account.donor")}</SelectItem>
+                                  <SelectItem value="organization">{t("account.organization")}</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -272,9 +266,9 @@ export default function AuthPage() {
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Password</FormLabel>
+                              <FormLabel>{t("auth.password")}</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="Create a password" {...field} />
+                                <Input type="password" placeholder={t("auth.password")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -285,9 +279,9 @@ export default function AuthPage() {
                           name="confirmPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Confirm Password</FormLabel>
+                              <FormLabel>{t("auth.confirmPassword")}</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="Confirm your password" {...field} />
+                                <Input type="password" placeholder={t("auth.confirmPassword")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -298,19 +292,21 @@ export default function AuthPage() {
                           className="w-full" 
                           disabled={registerMutation.isPending}
                         >
-                          {registerMutation.isPending ? "Creating account..." : "Create Account"}
+                          {registerMutation.isPending 
+                            ? t("auth.signup.loading")
+                            : t("auth.signup.button")}
                         </Button>
                       </form>
                     </Form>
                   </CardContent>
                   <CardFooter className="flex flex-col items-center">
                     <div className="text-sm text-gray-500">
-                      Already have an account?{" "}
+                      {t("auth.hasaccount")}{" "}
                       <button
                         className="text-primary hover:underline"
                         onClick={() => setActiveTab("login")}
                       >
-                        Sign in
+                        {t("auth.signin")}
                       </button>
                     </div>
                   </CardFooter>
@@ -320,31 +316,28 @@ export default function AuthPage() {
           </div>
         </div>
         
-        {/* Right side - Hero image and content */}
         <div className="hidden lg:flex flex-1 bg-primary text-white">
           <div className="flex flex-col justify-center px-12 py-12">
-            <h1 className="text-4xl font-bold mb-6">Make a Difference Today</h1>
-            <p className="text-xl mb-8">
-              Join GiveHope to support meaningful causes and help communities in need. Your contribution matters.
-            </p>
+            <h1 className="text-4xl font-bold mb-6">{t("app.tagline")}</h1>
+            <p className="text-xl mb-8">{t("app.description")}</p>
             <ul className="space-y-4 mb-8">
               <li className="flex items-center">
                 <div className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-primary mr-3">✓</div>
-                <span>Support impactful projects worldwide</span>
+                <span>{t("home.benefit1")}</span>
               </li>
               <li className="flex items-center">
                 <div className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-primary mr-3">✓</div>
-                <span>Track your donations and see the impact</span>
+                <span>{t("home.benefit2")}</span>
               </li>
               <li className="flex items-center">
                 <div className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-primary mr-3">✓</div>
-                <span>Connect with like-minded donors</span>
+                <span>{t("home.benefit3")}</span>
               </li>
             </ul>
             <div>
               <Link href="/campaigns">
                 <Button size="lg" variant="secondary" className="text-primary">
-                  Browse Campaigns
+                  {t("button.browse")}
                 </Button>
               </Link>
             </div>

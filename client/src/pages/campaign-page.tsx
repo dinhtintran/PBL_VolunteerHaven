@@ -3,6 +3,7 @@ import { Campaign, Category } from "@shared/schema";
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { useLanguage } from "@/hooks/use-language";
 import CampaignCard from "@/components/campaign/CampaignCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,8 @@ export default function CampaignPage() {
   
   const isLoading = isLoadingCampaigns || isLoadingCategories;
   
+  const { t } = useLanguage();
+  
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -45,16 +48,16 @@ export default function CampaignPage() {
       <div className="bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
-            Fundraising Campaigns
+            {t("nav.campaigns")}
           </h1>
           <p className="mt-5 max-w-xl mx-auto text-xl text-gray-500">
-            Browse all active campaigns and help make a difference.
+            {t("app.description")}
           </p>
           
           {user?.userType === "organization" && (
             <div className="mt-8">
               <Link href="/create-campaign">
-                <Button size="lg">Create New Campaign</Button>
+                <Button size="lg">{t("campaign.create")}</Button>
               </Link>
             </div>
           )}
@@ -69,7 +72,7 @@ export default function CampaignPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input 
                 type="text" 
-                placeholder="Search campaigns..." 
+                placeholder={t("campaign.form.title")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -81,10 +84,10 @@ export default function CampaignPage() {
                 onValueChange={setSelectedCategory}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={t("campaign.category")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="all">{t("home.categories")}</SelectItem>
                   {categories.map(category => (
                     <SelectItem key={category.id} value={category.name}>
                       {category.name}
@@ -113,12 +116,12 @@ export default function CampaignPage() {
           ) : (
             <div className="text-center py-20">
               <h3 className="text-xl font-medium text-gray-900 mb-4">
-                No campaigns found
+                {t("campaign.details")}
               </h3>
               <p className="text-gray-500 mb-8">
                 {searchTerm || selectedCategory !== "all" ? 
-                  "Try adjusting your search or filter criteria" : 
-                  "There are no active campaigns at the moment"}
+                  t("campaign.form.description") : 
+                  t("campaign.form.loading")}
               </p>
               {searchTerm || selectedCategory !== "all" ? (
                 <Button 
@@ -128,7 +131,7 @@ export default function CampaignPage() {
                     setSelectedCategory("all");
                   }}
                 >
-                  Clear Filters
+                  {t("button.cancel")}
                 </Button>
               ) : null}
             </div>

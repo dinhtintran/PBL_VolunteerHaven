@@ -15,15 +15,16 @@ const LanguageContext = createContext<LanguageContextType | null>(null);
 const translations: Record<Language, Record<string, string>> = {
   en: {
     // Chung
-    "app.name": "GiveHope",
+    "app.name": "VolunteerHaven",
     "app.tagline": "Make a Difference Today",
-    "app.description": "Join GiveHope to support meaningful causes and help communities in need. Your contribution matters.",
+    "app.description": "Join VolunteerHaven to support meaningful causes and help communities in need. Your contribution matters.",
     
     // Điều hướng
     "nav.home": "Home",
     "nav.campaigns": "Campaigns",
     "nav.donate": "Donate",
     "nav.about": "About",
+    "nav.contact": "Contact",
     "nav.dashboard": "Dashboard",
     "nav.admin": "Admin Portal",
     "nav.login": "Log in",
@@ -139,7 +140,7 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.contact": "Contact",
     "footer.privacy": "Privacy Policy",
     "footer.terms": "Terms of Service",
-    "footer.copyright": "© 2025 GiveHope. All rights reserved.",
+    "footer.copyright": "© 2025 VolunteerHaven. All rights reserved.",
     
     // Ngôn ngữ
     "language.en": "English",
@@ -147,15 +148,16 @@ const translations: Record<Language, Record<string, string>> = {
   },
   vi: {
     // Chung
-    "app.name": "GiveHope",
+    "app.name": "VolunteerHaven",
     "app.tagline": "Tạo nên sự khác biệt ngay hôm nay",
-    "app.description": "Tham gia GiveHope để hỗ trợ các mục đích ý nghĩa và giúp đỡ cộng đồng cần hỗ trợ. Sự đóng góp của bạn rất có ý nghĩa.",
+    "app.description": "Tham gia VolunteerHaven để hỗ trợ các mục đích ý nghĩa và giúp đỡ cộng đồng cần hỗ trợ. Sự đóng góp của bạn rất có ý nghĩa.",
     
     // Điều hướng
     "nav.home": "Trang chủ",
     "nav.campaigns": "Chiến dịch",
     "nav.donate": "Quyên góp",
     "nav.about": "Giới thiệu",
+    "nav.contact": "Liên hệ",
     "nav.dashboard": "Bảng điều khiển",
     "nav.admin": "Quản trị",
     "nav.login": "Đăng nhập",
@@ -271,7 +273,7 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.contact": "Liên hệ",
     "footer.privacy": "Chính sách bảo mật",
     "footer.terms": "Điều khoản dịch vụ",
-    "footer.copyright": "© 2025 GiveHope. Bản quyền thuộc về GiveHope.",
+    "footer.copyright": "© 2025 VolunteerHaven. Bản quyền thuộc về VolunteerHaven.",
     
     // Ngôn ngữ
     "language.en": "Tiếng Anh",
