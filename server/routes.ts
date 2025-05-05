@@ -1,10 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./service";
 import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertCampaignSchema, insertDonationSchema, insertCategorySchema } from "@shared/schema";
-
+import path from "path";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
@@ -55,9 +55,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       
-      if (user.userType !== "organization") {
-        return res.status(403).json({ message: "Only organizations can create campaigns" });
-      }
+      // if (user.userType !== "organization") {
+      //   return res.status(403).json({ message: "Only organizations can create campaigns" });
+      // }
       
       const campaignData = insertCampaignSchema.parse({
         ...req.body,
@@ -371,6 +371,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error rejecting campaign" });
     }
   });
+
+  app.get("/api/organizations/featured", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 3;
+      const organization = await storage.getFeaturedOrganizations(limit);
+      res.json(organization);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching featured organizations" });
+    }
+  });
+  app.get("/api/organizations/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const organization = await storage.getOrganizationById(parseInt(id, 10));
+  
+      if (!organization) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+  
+      res.json(organization);
+    } catch (error) {
+      console.error("Error fetching organization:", error);
+      res.status(500).json({ message: "Error fetching organization" });
+    }
+  });
+  // Get all categories
+app.get("/api/categories", async (req, res) => {
+  try {
+    const categories = await storage.getAllCategories(); // Lấy danh sách tất cả các danh mục từ cơ sở dữ liệu
+    res.json(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ message: "Error fetching categories" });
+  }
+});
 
   const httpServer = createServer(app);
   return httpServer;

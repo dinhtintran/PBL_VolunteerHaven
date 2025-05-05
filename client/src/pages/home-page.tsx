@@ -29,42 +29,47 @@ export default function HomePage() {
     staleTime: 300000, // 5 minutes
   });
 
-  // Mock top organizations for display (in a real implementation, this would come from the API)
-  const topOrganizations = [
-    {
-      id: 1,
-      fullName: "John Smith",
-      bio: "GiveHope Founder",
-      profileImage: "https://images.unsplash.com/photo-1537511446984-935f663eb1f4",
-      username: "johnsmith",
-      password: "",
-      email: "john@givehope.org",
-      userType: "organization",
-      createdAt: new Date()
-    },
-    {
-      id: 2,
-      fullName: "Jane Doe",
-      bio: "Children's Fund Manager",
-      profileImage: "https://images.unsplash.com/photo-1554232456-8727aae0cfa4",
-      username: "janedoe",
-      password: "",
-      email: "jane@givehope.org",
-      userType: "organization",
-      createdAt: new Date()
-    },
-    {
-      id: 3,
-      fullName: "Robert Johnson",
-      bio: "Education Development Representative",
-      profileImage: "https://images.unsplash.com/photo-1580894742597-87bc8789db3d",
-      username: "robertj",
-      password: "",
-      email: "robert@givehope.org",
-      userType: "organization",
-      createdAt: new Date()
-    }
-  ] as User[];
+    // Fetch featured organizations
+  const { data: topOrganizations = [] } = useQuery<User[]>({
+    queryKey: ["/api/organizations/featured"],
+    staleTime: 300000, // 5 minutes
+  });
+  // // Mock top organizations for display (in a real implementation, this would come from the API)
+  // const topOrganizations = [
+  //   {
+  //     id: 1,
+  //     fullName: "John Smith",
+  //     bio: "GiveHope Founder",
+  //     profileImage: "https://images.unsplash.com/photo-1537511446984-935f663eb1f4",
+  //     username: "johnsmith",
+  //     password: "",
+  //     email: "john@givehope.org",
+  //     userType: "organization",
+  //     createdAt: new Date()
+  //   },
+  //   {
+  //     id: 2,
+  //     fullName: "Jane Doe",
+  //     bio: "Children's Fund Manager",
+  //     profileImage: "https://images.unsplash.com/photo-1554232456-8727aae0cfa4",
+  //     username: "janedoe",
+  //     password: "",
+  //     email: "jane@givehope.org",
+  //     userType: "organization",
+  //     createdAt: new Date()
+  //   },
+  //   {
+  //     id: 3,
+  //     fullName: "Robert Johnson",
+  //     bio: "Education Development Representative",
+  //     profileImage: "https://images.unsplash.com/photo-1580894742597-87bc8789db3d",
+  //     username: "robertj",
+  //     password: "",
+  //     email: "robert@givehope.org",
+  //     userType: "organization",
+  //     createdAt: new Date()
+  //   }
+  //] as User[];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -132,7 +137,7 @@ export default function HomePage() {
                 <CampaignCard key={campaign.id} campaign={campaign} />
               ))}
               
-              {/* If no campaigns are available yet, show placeholder cards */}
+              If no campaigns are available yet, show placeholder cards
               {featuredCampaigns.length === 0 && (
                 <>
                   <CampaignCard 
@@ -282,29 +287,42 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Featured Organizations */}
       <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Featured Organizations and Individuals
-            </h2>
-            <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-              Individuals and organizations creating positive change
-            </p>
-          </div>
+  <div className="max-w-7xl mx-auto">
+    <div className="text-center">
+      <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+        Featured Organizations and Individuals
+      </h2>
+      <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+        Individuals and organizations creating positive change
+      </p>
+    </div>
 
-          <div className="mt-12 max-w-lg mx-auto grid gap-8 lg:grid-cols-3 lg:max-w-none">
-            {topOrganizations.map((org, index) => (
-              <OrganizationCard 
-                key={org.id} 
-                organization={org} 
-                raisedAmount={[1589000, 2890000, 3670000][index]}
-              />
-            ))}
+    <div className="mt-12 max-w-lg mx-auto grid gap-8 lg:grid-cols-3 lg:max-w-none">
+      {topOrganizations.map((org, index) => (
+        <div key={org.id} className="bg-white shadow-lg rounded-lg p-6">
+          <img
+            src={org.profile_image}
+            alt={org.full_name}
+            className="h-16 w-16 rounded-full mx-auto"
+          />
+          <h3 className="mt-4 text-lg font-bold text-center">{org.full_name}</h3>
+          <p className="mt-2 text-sm text-gray-500 text-center">{org.bio}</p>
+          <p className="mt-4 text-center text-primary font-semibold">
+            Raised: ${[1589000, 2890000, 3670000][index].toLocaleString()}
+          </p>
+          <div className="mt-4 text-center">
+            <Link href={`/organizations/${org.id}`}>
+              <Button size="sm" variant="outline" className="text-primary">
+                View Detail
+              </Button>
+            </Link>
           </div>
         </div>
-      </div>
+      ))}
+    </div>
+  </div>
+</div>
       
       {/* CTA Section */}
       <div className="bg-primary">

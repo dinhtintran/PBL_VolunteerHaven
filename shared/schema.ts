@@ -39,7 +39,10 @@ export const campaigns = pgTable("campaigns", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertCampaignSchema = createInsertSchema(campaigns).omit({
+export const insertCampaignSchema = createInsertSchema(campaigns, {
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date().optional(),
+}).omit({
   id: true,
   currentAmount: true,
   createdAt: true,

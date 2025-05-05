@@ -86,8 +86,7 @@ export default function OrganizationPage() {
                 src={organization.profileImage || `https://ui-avatars.com/api/?name=${organization.fullName}&background=random`} 
                 alt={organization.fullName} 
               />
-              <AvatarFallback>{organization.fullName.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <AvatarFallback>{organization.fullName ? organization.fullName.charAt(0) : "?"}</AvatarFallback>            </Avatar>
             
             <div className="text-center md:text-left">
               <div className="flex items-center mb-2">
