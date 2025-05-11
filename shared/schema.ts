@@ -8,10 +8,10 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
-  fullName: text("full_name").notNull(),
-  userType: text("user_type").notNull().default("donor"), // donor, organization, or admin
+  full_name: text("full_name").notNull(),
+  user_type: text("user_type").notNull().default("donor"), // donor, organization, or admin
   bio: text("bio"),
-  profileImage: text("profile_image"),
+  profile_image: text("profile_image"),
   isApproved: boolean("is_approved").default(false), // For organizations
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),

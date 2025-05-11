@@ -165,18 +165,18 @@ export default function AdminPage() {
 
   // Filter organizations
   const pendingOrganizations = organizations.filter(org => 
-    org.userType === "organization" && !org.isApproved
+    !org.isApproved
   );
   
   const approvedOrganizations = organizations.filter(org => 
-    org.userType === "organization" && org.isApproved
+    org.isApproved
   );
   
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <div className="flex-grow bg-gray-50 py-12">
+      <div className="flex-grow bg-gray-50 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
@@ -204,7 +204,7 @@ export default function AdminPage() {
             <TabsContent value="organizations" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Pending Organizations</CardTitle>
+                  <CardTitle>Pending Organizations & User</CardTitle>
                   <CardDescription>
                     Organizations waiting for approval
                   </CardDescription>
@@ -282,7 +282,7 @@ export default function AdminPage() {
               
               <Card>
                 <CardHeader>
-                  <CardTitle>Approved Organizations</CardTitle>
+                  <CardTitle>Approved Organizations & User</CardTitle>
                   <CardDescription>
                     Organizations that can create campaigns
                   </CardDescription>
@@ -373,8 +373,10 @@ export default function AdminPage() {
                                 {campaign.organizationId}
                               </td>
                               <td className="p-4">
-                                ${campaign.goalAmount.toLocaleString()}
-                              </td>
+  {campaign.goalAmount !== undefined && campaign.goalAmount !== null
+    ? `$${campaign.goalAmount.toLocaleString()}`
+    : "N/A"}
+</td>
                               <td className="p-4">
                                 {campaign.category}
                               </td>

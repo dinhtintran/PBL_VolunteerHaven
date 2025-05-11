@@ -282,7 +282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const users = await storage.getAllUsers();
       res.json(users);
     } catch (error) {
-      res.status(500).json({ message: "Error fetching organizations" });
+      res.status(500).json({ message: "Error fetching user" });
     }
   });
 
@@ -297,20 +297,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Approve organization
+  // Approve organization
   app.patch("/api/admin/organizations/:id/approve", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const user = await storage.getUser(id);
+      const user = await storage.getOrganizationById(id);
       
       if (!user) {
         return res.status(404).json({ message: "Organization not found" });
       }
       
-      if (user.userType !== "organization") {
-        return res.status(400).json({ message: "User is not an organization" });
-      }
+      // if (user.userType !== "organization") {
+      //   return res.status(400).json({ message: "User is not an organization" });
+      // }
       
-      const updatedUser = await storage.updateUser(id, { isApproved: true });
+      const updatedUser = await storage.updateUser(id, { is_approved: true });
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ message: "Error approving organization" });
@@ -321,17 +322,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/admin/organizations/:id/reject", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const user = await storage.getUser(id);
+      const user = await storage.getOrganizationById(id);
       
       if (!user) {
         return res.status(404).json({ message: "Organization not found" });
       }
       
-      if (user.userType !== "organization") {
-        return res.status(400).json({ message: "User is not an organization" });
-      }
+      // if (user.userType !== "organization") {
+      //   return res.status(400).json({ message: "User is not an organization" });
+      // }
       
-      const updatedUser = await storage.updateUser(id, { isApproved: false });
+      const updatedUser = await storage.updateUser(id, { is_approved: false });
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ message: "Error rejecting organization" });
@@ -348,7 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Campaign not found" });
       }
       
-      const updatedCampaign = await storage.updateCampaign(id, { isApproved: true });
+      const updatedCampaign = await storage.updateCampaign(id, { is_approved: true });
       res.json(updatedCampaign);
     } catch (error) {
       res.status(500).json({ message: "Error approving campaign" });
@@ -365,7 +366,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Campaign not found" });
       }
       
-      const updatedCampaign = await storage.updateCampaign(id, { isApproved: false, isActive: false });
+      const updatedCampaign = await storage.updateCampaign(id, { is_approved: false, is_active: false });
       res.json(updatedCampaign);
     } catch (error) {
       res.status(500).json({ message: "Error rejecting campaign" });

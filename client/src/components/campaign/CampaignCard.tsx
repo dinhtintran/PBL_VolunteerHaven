@@ -4,7 +4,8 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Campaign } from "@shared/schema";
-
+import { useLanguage } from "@/hooks/use-language";
+import { LanguageSwitcher } from "../language/LanguageSwitcher";
 interface CampaignCardProps {
   campaign: Campaign;
 }
@@ -13,6 +14,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
   const progress = Math.min(Math.round((campaign.currentAmount || 0) / (campaign.goalAmount || 1) * 100), 100);
   
   const formatCurrency = (amount: number) => {
+    const { t } = useLanguage();
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',

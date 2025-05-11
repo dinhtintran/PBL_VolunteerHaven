@@ -1,16 +1,18 @@
 import pool from "./database/connection";
 import { type User, type InsertUser, type Campaign, type InsertCampaign, type Donation, type InsertDonation, type Category, type InsertCategory } from "@shared/schema";
-
+import session from "express-session";
+import pgSession from "connect-pg-simple";
 export class Storage {
+  
   // User operations
   async getUser(id: number): Promise<User | undefined> {
     const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
-    return result.rows[0] || undefined;
+    return result.rows[0] || null;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
-    return result.rows[0] || undefined;
+    return result.rows[0] || null;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
@@ -91,6 +93,14 @@ export class Storage {
   async updateCampaign(id: number, campaign: Partial<Campaign>): Promise<Campaign | undefined> {
     const fields = Object.keys(campaign).map((key, index) => `${key} = $${index + 2}`).join(", ");
     const values = Object.values(campaign);
+    
+    console.log("Fields to update:", fields);
+    console.log("Values to update:", values);
+  
+    if (!fields) {
+      throw new Error("No fields to update");
+    }
+  
     const result = await pool.query(
       `UPDATE campaigns SET ${fields} WHERE id = $1 RETURNING *`,
       [id, ...values]
@@ -182,7 +192,7 @@ async getOrganizationById(id: number): Promise<User | undefined> {
         const result = await pool.query(
         `SELECT id, full_name, bio, profile_image, username, email, user_type, created_at
         FROM users
-        WHERE id = $1 AND user_type = 'organization'`,
+        WHERE id = $1 `,
         [id]
         );
         return result.rows[0];
@@ -217,8 +227,22 @@ async updateUserProfile(
   const query = `UPDATE users SET ${fields.join(", ")} WHERE id = $${index}`;
   await pool.query(query, values);
 }
-
 }
 
 
 export const storage = new Storage();
+const sessionStore = new (pgSession(session))({
+  pool, // Kết nối tới PostgreSQL
+  tableName: "session", // Tên bảng lưu trữ session
+});
+
+export const sessionSettings: session.SessionOptions = {
+  secret: process.env.SESSION_SECRET || "your-secret-key",
+  resave: false,
+  saveUninitialized: false,
+  store: sessionStore, // Sử dụng session store
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 tuần
+  },
+};
