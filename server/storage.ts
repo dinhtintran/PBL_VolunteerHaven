@@ -552,7 +552,6 @@
 
 // export const storage = new MemStorage();
 
-
 import { PrismaClient } from "@prisma/client";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -619,9 +618,31 @@ export class DatabaseStorage implements IStorage {
     return prisma.campaign.findMany({ where: { isApproved: false } });
   }
 
+  // async createCampaign(campaign: InsertCampaign) {
+  //   return prisma.campaign.create({ data: campaign });
+  // }
   async createCampaign(campaign: InsertCampaign) {
-    return prisma.campaign.create({ data: campaign });
+  if (!campaign.categoryId || !campaign.organizationId) {
+    throw new Error("Missing categoryId or organizationId");
   }
+
+  return prisma.campaign.create({
+    data: {
+      title: campaign.title,
+      description: campaign.description,
+      goalAmount: campaign.goalAmount,
+      imageUrl: campaign.imageUrl,
+      startDate: campaign.startDate,
+      endDate: campaign.endDate,
+      isActive: campaign.isActive,
+      isApproved: campaign.isApproved,
+      category: { connect: { id: campaign.categoryId } },  // Sử dụng categoryId thay vì category
+      organization: { connect: { id: campaign.organizationId } },
+    },
+  });
+}
+
+
 
   async updateCampaign(id: number, campaign: Partial<Campaign>) {
     return prisma.campaign.update({ where: { id }, data: campaign });

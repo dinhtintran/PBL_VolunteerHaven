@@ -19,6 +19,7 @@ model User {
   isApproved   Boolean  @default(false)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
+  proofFiles    String[]
   
   campaigns    Campaign[] @relation("OrganizationCampaigns")
   donations    Donation[] @relation("UserDonations")
@@ -26,36 +27,37 @@ model User {
   @@map("users") // <- ánh xạ model User sang bảng users
 }
 
-model Category {
-  id            Int        @id @default(autoincrement())
-  name          String     @unique
-  description   String
-  imageUrl      String
-  campaignCount Int        @default(0)
-  campaigns     Campaign[]
-}
-
 model Campaign {
-  id             Int       @id @default(autoincrement())
+  id             Int        @id @default(autoincrement())
   title          String
   description    String
   goalAmount     Float
-  currentAmount  Float     @default(0)
-  categoryId     Int
-  category       Category  @relation(fields: [categoryId], references: [id])
-
+  currentAmount  Float      @default(0)
   organizationId Int
-  organization   User      @relation("OrganizationCampaigns", fields: [organizationId], references: [id])
-
-  imageUrl       String
+  organization   User       @relation("OrganizationCampaigns", fields: [organizationId], references: [id])
+  imageUrl       String?
   startDate      DateTime
   endDate        DateTime
-  createdAt      DateTime  @default(now())
-  isActive       Boolean   @default(true)
-  isApproved     Boolean   @default(false)
+  createdAt      DateTime   @default(now())
+  isActive       Boolean    @default(true)
+  isApproved     Boolean    @default(false)
 
   donations      Donation[]
+  categories     Category[] @relation("CampaignCategories") // Quan hệ nhiều-nhiều với Category
+
+  
 }
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String
+  imageUrl    String?
+  campaignCount Int      @default(0)
+
+  campaigns   Campaign[] @relation("CampaignCategories") // Quan hệ nhiều-nhiều với Campaign
+}
+
 
 model Donation {
   id          Int      @id @default(autoincrement())

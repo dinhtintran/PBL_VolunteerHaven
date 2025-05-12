@@ -373,7 +373,7 @@ export default function AdminPage() {
                                 {campaign.organizationId}
                               </td>
                               <td className="p-4">
-                                ${campaign.goalAmount.toLocaleString()}
+                                {campaign.goalAmount != null ? `$${campaign.goalAmount.toLocaleString()}` : "$0"}
                               </td>
                               <td className="p-4">
                                 {campaign.category}

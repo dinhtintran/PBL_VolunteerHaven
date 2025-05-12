@@ -1,4 +1,5 @@
 import { useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -95,13 +96,20 @@ export default function CreateCampaign() {
   });
   
   const onSubmit = (values: CampaignFormValues) => {
-    createCampaignMutation.mutate({
-      ...values,
-      goalAmount: Number(values.goalAmount),
-      organizationId: user?.id || 0,
-    });
-  };
-  
+  console.log("submitting", values); // Thử log trước
+  createCampaignMutation.mutate({
+    ...values,
+    goalAmount: Number(values.goalAmount),
+    organizationId: user?.id || 0,
+  });
+};
+
+useEffect(() => {
+  if (user?.id) {
+    form.setValue("organizationId", user.id);
+  }
+}, [user?.id]);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />

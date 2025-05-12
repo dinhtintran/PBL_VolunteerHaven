@@ -1,10 +1,14 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./service";
+import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
+import multer from "multer"; 
 import { insertCampaignSchema, insertDonationSchema, insertCategorySchema } from "@shared/schema";
 
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
@@ -48,31 +52,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create campaign (protected)
   app.post("/api/campaigns", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "You must be logged in to create a campaign" });
-    }
-    
     try {
-      const user = req.user;
-      
-      if (user.userType !== "organization") {
-        return res.status(403).json({ message: "Only organizations can create campaigns" });
-      }
-      
-      const campaignData = insertCampaignSchema.parse({
-        ...req.body,
-        organizationId: user.id
+    const {
+      title,
+      description,
+      goalAmount,
+      organizationId,
+      imageUrl,
+      startDate,
+      endDate,
+      categoryIds // <-- Mảng category ID
+    } = req.body;
+
+    if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+      return res.status(400).json({
+        message: "Invalid campaign data",
+        errors: [{
+          code: "invalid_type",
+          expected: "array of integers",
+          received: typeof categoryIds,
+          path: ["categoryIds"],
+          message: "At least one category is required"
+        }]
       });
-      
-      const campaign = await storage.createCampaign(campaignData);
-      res.status(201).json(campaign);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid campaign data", errors: error.errors });
-      }
-      res.status(500).json({ message: "Error creating campaign" });
     }
-  });
+
+    const campaign = await prisma.campaign.create({
+      data: {
+        title,
+        description,
+        goalAmount,
+        organizationId,
+        imageUrl,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        categories: {
+          connect: categoryIds.map(id => ({ id }))
+        }
+      },
+      include: {
+        categories: true
+      }
+    });
+
+    res.status(201).json(campaign);
+  } catch (error) {
+    console.error("Error creating campaign:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+});
 
   // Update campaign (protected)
   app.patch("/api/campaigns/:id", async (req, res) => {
@@ -371,7 +399,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error rejecting campaign" });
     }
   });
-
+  
+  
   const httpServer = createServer(app);
   return httpServer;
 }
