@@ -43,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
+      localStorage.setItem("user", JSON.stringify(user));
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
@@ -64,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
+      localStorage.setItem("user", JSON.stringify(user));
       toast({
         title: "Welcome back, Admin!",
         description: "You have successfully signed in as administrator.",

@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./service";
 import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertCampaignSchema, insertDonationSchema, insertCategorySchema } from "@shared/schema";
