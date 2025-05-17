@@ -5,7 +5,7 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import {store} from "./service";
+
 import { User as SelectUser } from "@shared/schema";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
@@ -36,11 +36,17 @@ export function setupAuth(app: Express) {
     secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
     saveUninitialized: false,
-    store: store,
+    store: storage.sessionStore,
+    // cookie: {
+    //   secure: process.env.NODE_ENV === "production",
+    //   maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    // }
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-    }
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax", // hoặc "none" nếu frontend ở domain khác
+  maxAge: 1000 * 60 * 60 * 24 * 7,
+}
+
   };
 
   app.set("trust proxy", 1);

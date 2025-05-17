@@ -30,14 +30,15 @@ export const campaigns = pgTable("campaigns", {
   organizationId: integer("organization_id").notNull(),
   goalAmount: doublePrecision("goal_amount").notNull(),
   currentAmount: doublePrecision("current_amount").notNull().default(0),
-  category: text("category").notNull(),
+  categoryId: integer("category_id").notNull(), // ✅ thay vì `category`
   imageUrl: text("image_url"),
   startDate: timestamp("start_date").notNull().defaultNow(),
   endDate: timestamp("end_date"),
   isActive: boolean("is_active").notNull().default(true),
-  isApproved: boolean("is_approved").default(false), // Admin approval status
+  isApproved: boolean("is_approved").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
 
 export const insertCampaignSchema = createInsertSchema(campaigns).omit({
   id: true,

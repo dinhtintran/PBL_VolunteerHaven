@@ -14,7 +14,8 @@ import AdminPage from "@/pages/admin-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { LanguageProvider } from "@/hooks/use-language";
 import { ProtectedRoute } from "@/lib/protected-route";
-
+import About from "@/pages/about-page";
+import Contact from "@/pages/contact-page";
 function Router() {
   return (
     <Switch>
@@ -23,6 +24,8 @@ function Router() {
       <Route path="/campaigns" component={CampaignPage} />
       <Route path="/campaigns/:id" component={CampaignDetails} />
       <Route path="/organizations/:id" component={OrganizationPage} />
+       <Route path="/about" component={About} />
+      <Route path="/contact" component={Contact} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/create-campaign" component={CreateCampaign} />
       <ProtectedRoute path="/admin" component={AdminPage} />

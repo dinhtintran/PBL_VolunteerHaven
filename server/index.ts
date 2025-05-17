@@ -1,8 +1,14 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-
+import cors from "cors";
 const app = express();
+app.use(cors({
+  origin: "http://localhost:5000", // hoặc port frontend bạn đang dùng
+  credentials: true,               // 🔥 BẮT BUỘC để gửi cookie
+}));
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -36,9 +42,7 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
-  await import("./database/connection");
-})();
+
 
 (async () => {
   const server = await registerRoutes(app);
@@ -66,7 +70,7 @@ app.use((req, res, next) => {
   const port = 5000;
   server.listen({
     port,
-    host: "0.0.0.0",
+    host: "localhost",
     // reusePort: true,
   }, () => {
     log(`serving on port ${port}`);

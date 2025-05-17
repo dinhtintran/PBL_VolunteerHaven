@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./service";
+import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertCampaignSchema, insertDonationSchema, insertCategorySchema } from "@shared/schema";
@@ -11,6 +11,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get all campaigns
   app.get("/api/campaigns", async (req, res) => {
+    
     try {
       const campaigns = await storage.getAllCampaigns();
       res.json(campaigns);
@@ -59,19 +60,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only organizations can create campaigns" });
       }
       
-      const campaignData = insertCampaignSchema.parse({
-        ...req.body,
-        organizationId: user.id
-      });
+      // const campaignData = insertCampaignSchema.parse({
+      //   ...req.body,
+      //   organizationId: user.id
+      // });
       
+      // const campaignData = insertCampaignSchema.parse({
+      //   ...req.body,
+      //   startDate: new Date(req.body.startDate),
+      //   endDate: new Date(req.body.endDate),
+      //   organizationId: user.id, // Hoặc organizerId nếu schema đặt tên như vậy
+        
+      // });
+//       const campaignData = insertCampaignSchema.parse({
+//   ...req.body,
+//   startDate: new Date(req.body.startDate),
+//   endDate: new Date(req.body.endDate),
+//   organizationId: user.id,
+//   categoryId: 1 // 👈 thay bằng ID tương ứng trong bảng Category
+// });
+const campaignData = insertCampaignSchema.parse({
+  ...req.body,
+  startDate: new Date(req.body.startDate),
+  endDate: req.body.endDate ? new Date(req.body.endDate) : undefined,
+  organizationId: user.id
+});
+
+
+      console.log("🧾 Final campaignData:", campaignData);
       const campaign = await storage.createCampaign(campaignData);
       res.status(201).json(campaign);
+    // } catch (error) {
+    //   if (error instanceof z.ZodError) {
+    //     return res.status(400).json({ message: "Invalid campaign data", errors: error.errors });
+    //   }
+    //   res.status(500).json({ message: "Error creating campaign" });
+    // }
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid campaign data", errors: error.errors });
-      }
-      res.status(500).json({ message: "Error creating campaign" });
-    }
+  console.error("❌ Campaign creation failed:", error);
+
+  if (error instanceof z.ZodError) {
+    return res.status(400).json({ message: "Invalid campaign data", errors: error.errors });
+  }
+
+  // Log Prisma error nếu có
+  if (error.code) {
+    return res.status(500).json({ message: "Database error", code: error.code, details: error });
+  }
+
+  res.status(500).json({ message: "Error creating campaign", error });
+}
+
   });
 
   // Update campaign (protected)
