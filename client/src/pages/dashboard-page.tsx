@@ -143,10 +143,16 @@ export default function DashboardPage() {
               </div>
               
               <div className="mt-6">
-                <Button variant="outline" size="sm">
+                {/* <Button variant="outline" size="sm">
                   <Settings className="mr-2 h-4 w-4" />
                   Edit Profile
-                </Button>
+                </Button> */}
+                <Link href="/edit-profile">
+        <Button variant="outline" size="sm">
+          <Settings className="mr-2 h-4 w-4" />
+          Edit Profile
+        </Button>
+      </Link>
               </div>
             </CardContent>
           </Card>

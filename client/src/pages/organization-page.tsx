@@ -15,14 +15,23 @@ export default function OrganizationPage() {
   const { id } = useParams<{ id: string }>();
   
   // Fetch organization details
+  // const { data: organization, isLoading: isLoadingOrganization } = useQuery<User>({
+  //   queryKey: [`/api/organizations/${id}`],
+  //   queryFn: async () => {
+  //     const res = await fetch(`/api/organizations/${id}`);
+  //     if (!res.ok) throw new Error("Failed to load organization details");
+  //     return res.json();
+  //   },
+  // });
+
   const { data: organization, isLoading: isLoadingOrganization } = useQuery<User>({
-    queryKey: [`/api/organizations/${id}`],
-    queryFn: async () => {
-      const res = await fetch(`/api/organizations/${id}`);
-      if (!res.ok) throw new Error("Failed to load organization details");
-      return res.json();
-    },
-  });
+  queryKey: [`/api/organizations/${id}`],
+  queryFn: async () => {
+    const res = await fetch(`/api/organizations/${id}`);
+    if (!res.ok) throw new Error("Failed to load organization details");
+    return res.json();
+  },
+});
   
   // Fetch organization's campaigns
   const { data: campaigns = [], isLoading: isLoadingCampaigns } = useQuery<Campaign[]>({

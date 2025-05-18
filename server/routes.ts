@@ -21,6 +21,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/organizations", async (req, res) => {
+  try {
+    const organizations = await storage.getAllOrganizations(); // lấy từ hàm mới
+    res.json(organizations); // trả kết quả
+  } catch (error) {
+    console.error("Error fetching organizations:", error);
+    res.status(500).json({ message: "Error fetching organizations" });
+    console.log("Organizations:", organizations);
+    console.log(organizations);
+
+  }
+});
+
+
   // Get featured campaigns
   app.get("/api/campaigns/featured", async (req, res) => {
     try {

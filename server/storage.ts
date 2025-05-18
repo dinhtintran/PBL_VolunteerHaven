@@ -32,8 +32,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: number, user: Partial<User>) {
-    return prisma.user.update({ where: { id }, data: user });
-  }
+  return prisma.user.update({
+    where: { id },
+    data: user,
+  });
+}
 
   async getAllUsers() {
     return prisma.user.findMany();
@@ -51,6 +54,19 @@ export class DatabaseStorage implements IStorage {
   async getAllCampaigns() {
     return prisma.campaign.findMany();
   }
+
+  async getAllOrganizations() {
+  return prisma.user.findMany({
+    where: {
+      userType: "organization",         // chỉ lấy người dùng là tổ chức
+      isApproved: true,                 // và đã được duyệt (nếu cần)
+    },
+    include: {
+      campaigns: true                   // lấy cả danh sách chiến dịch của tổ chức đó
+    }
+  });
+}
+  
 
   async getFeaturedCampaigns(limit: number = 3) {
     return prisma.campaign.findMany({
@@ -148,6 +164,7 @@ export class DatabaseStorage implements IStorage {
       where: {
         id,
         userType: "organization",
+        isApproved: true,
       },
       select: {
         id: true,

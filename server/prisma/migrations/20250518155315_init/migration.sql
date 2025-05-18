@@ -38,6 +38,8 @@ CREATE TABLE "Category" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
+    "imageUrl" TEXT,
+    "campaignCount" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
 );
