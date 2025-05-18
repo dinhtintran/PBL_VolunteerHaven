@@ -143,6 +143,24 @@ export class DatabaseStorage implements IStorage {
       data: links,
     });
   }
+  async getOrganizationById(id: number) {
+    return prisma.user.findFirst({
+      where: {
+        id,
+        userType: "organization",
+      },
+      select: {
+        id: true,
+        fullName: true,
+        bio: true,
+        profileImage: true,
+        username: true,
+        email: true,
+        userType: true,
+        createdAt: true,
+      },
+    });
+  }
 }
 
 export const storage = new DatabaseStorage();

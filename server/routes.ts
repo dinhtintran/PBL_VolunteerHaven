@@ -300,7 +300,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error updating profile" });
     }
   });
+  app.get("/api/organizations/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const organization = await storage.getOrganizationById(parseInt(id, 10));
 
+      if (!organization) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+
+      res.json(organization);
+    } catch (error) {
+      console.error("Error fetching organization:", error);
+      res.status(500).json({ message: "Error fetching organization" });
+    }
+  });
   // ADMIN ROUTES
   // Middleware to check if user is admin
   const isAdmin = (req: any, res: any, next: any) => {
