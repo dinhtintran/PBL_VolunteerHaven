@@ -14,8 +14,9 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-
+import { useLanguage } from "@/hooks/use-language";
 export default function DashboardPage() {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(null);
@@ -94,13 +95,13 @@ export default function DashboardPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <div className="flex-grow bg-gray-50 py-12">
+      <div className="flex-grow bg-gray-50 py-12 pt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{t("nav.dashboard")}</h1>
               <p className="text-gray-600 mt-1">
-                Welcome back, {user?.fullName}
+              {t("dashboard.welcome")}, {user?.fullName}
               </p>
             </div>
             
@@ -108,7 +109,7 @@ export default function DashboardPage() {
               <Link href="/create-campaign">
                 <Button className="mt-4 md:mt-0">
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Create Campaign
+                  {t("campaign.create")}
                 </Button>
               </Link>
             )}
@@ -117,36 +118,39 @@ export default function DashboardPage() {
           {/* User Profile Card */}
           <Card className="mb-8">
             <CardHeader className="pb-3">
-              <CardTitle>Profile Information</CardTitle>
+              <CardTitle>{t("profile.information")}</CardTitle>
               <CardDescription>
-                Your account details and preferences
+              {t("profile.des")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Full Name</h3>
+                  <h3 className="text-sm font-medium text-gray-500">{t("auth.fullname")}</h3>
                   <p className="mt-1 text-lg">{user?.fullName}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Email</h3>
+                  <h3 className="text-sm font-medium text-gray-500">{t("auth.email")}</h3>
                   <p className="mt-1 text-lg">{user?.email}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Username</h3>
+                  <h3 className="text-sm font-medium text-gray-500">{t("auth.username")}</h3>
                   <p className="mt-1 text-lg">{user?.username}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Account Type</h3>
+                  <h3 className="text-sm font-medium text-gray-500">{t("auth.accountType")}</h3>
                   <p className="mt-1 text-lg capitalize">{user?.userType}</p>
                 </div>
               </div>
               
               <div className="mt-6">
-                <Button variant="outline" size="sm">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Edit Profile
-                </Button>
+              <Link href="/edit-profile">
+              <Button variant="outline" size="sm">
+                <Settings className="mr-2 h-4 w-4" />
+                {t("profile.editTitle")}
+              </Button>
+            </Link>
+
               </div>
             </CardContent>
           </Card>
@@ -235,10 +239,10 @@ export default function DashboardPage() {
                 <Card>
                   <CardContent className="p-12 text-center">
                     <h3 className="text-xl font-medium text-gray-900 mb-4">
-                      You haven't created any campaigns yet
+                    {t("auth.des")}
                     </h3>
                     <p className="text-gray-500 mb-8">
-                      Start your first fundraising campaign to make a difference
+                    {t("auth.des1")} Start your first fundraising campaign to make a difference
                     </p>
                     <Link href="/create-campaign">
                       <Button>

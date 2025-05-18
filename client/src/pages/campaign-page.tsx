@@ -11,10 +11,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Search } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useLocation } from "wouter";
 
 export default function CampaignPage() {
+
+  //
+  const [location] = useLocation();
+  const urlParams = new URLSearchParams(location.split("?")[1]);
+  const categoryFromUrl = urlParams.get("category");
+  //
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  //const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>(categoryFromUrl ?? "all");
   
   const { user } = useAuth();
   
@@ -45,7 +53,8 @@ export default function CampaignPage() {
       <Navbar />
       
       {/* Header */}
-      <div className="bg-white py-12">
+      <div className="bg-white py-12 pt-32">
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
             {t("nav.campaigns")}
@@ -65,7 +74,7 @@ export default function CampaignPage() {
       </div>
       
       {/* Filter Section */}
-      <div className="bg-white border-t border-gray-200">
+      <div className="bg-white border-t border-gray-200 " >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-grow">

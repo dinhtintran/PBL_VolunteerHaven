@@ -9,8 +9,9 @@ import OrganizationCard from "@/components/campaign/OrganizationCard";
 import StatCard from "@/components/stats/StatCard";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Mail, Phone } from "lucide-react";
-
+import { useLanguage } from "@/hooks/use-language";
 export default function HomePage() {
+  const { t } = useLanguage();
   // Fetch featured campaigns
   const { data: featuredCampaigns = [] } = useQuery<Campaign[]>({
     queryKey: ["/api/campaigns/featured"],
@@ -28,6 +29,15 @@ export default function HomePage() {
     queryKey: ["/api/stats"],
     staleTime: 300000, // 5 minutes
   });
+  
+const { data: organizations = [], isLoading } = useQuery<User[]>({
+  queryKey: ["organizations"],
+  queryFn: async () => {
+    const res = await fetch("/api/organizations");
+    if (!res.ok) throw new Error("Failed to fetch organizations");
+    return res.json();
+  },
+});
 
   // Mock top organizations for display (in a real implementation, this would come from the API)
   const topOrganizations = [
@@ -83,24 +93,24 @@ export default function HomePage() {
             <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
               <div className="sm:text-center lg:text-left">
                 <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block xl:inline">Featured fundraising</span>
-                  <span className="block text-primary xl:inline"> campaigns</span>
+                  {t("home.featured")}
+                  <span className="block text-primary xxl:inline"> {t("home.featured1")}</span>
                 </h1>
                 <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Children's relief campaign - Join us to bring better opportunities to disadvantaged children in mountain areas.
+                {t("home.des")}
                 </p>
                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                   <div className="rounded-md shadow">
                     <Link href="/campaigns">
                       <Button size="lg" className="w-full">
-                        Donate Now
+                      {t("campaign.donate")}
                       </Button>
                     </Link>
                   </div>
                   <div className="mt-3 sm:mt-0 sm:ml-3">
                     <Link href="/about">
                       <Button size="lg" variant="outline" className="w-full">
-                        Learn More
+                      {t("footer.about")}
                       </Button>
                     </Link>
                   </div>
@@ -110,7 +120,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-          <img className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full" src="https://i.ibb.co/4wtFnDCh/home-page.png" alt="Children in rural area" />
+          <img className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full" src="https://cdnweb01.wikitree.co.kr/webdata/editor/202007/15/img_20200715110057_7a84181c.webp" alt="Children in rural area" />
         </div>
       </div>
       
@@ -119,10 +129,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Children's Relief Campaigns
+            {t("home.des1")}
             </p>
             <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              Campaigns that need community support
+            {t("home.des2")}
             </p>
           </div>
 
@@ -132,7 +142,7 @@ export default function HomePage() {
                 <CampaignCard key={campaign.id} campaign={campaign} />
               ))}
               
-              {/* If no campaigns are available yet, show placeholder cards */}
+          
               {featuredCampaigns.length === 0 && (
                 <>
                   <CampaignCard 
@@ -194,10 +204,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Charitable Community Actions
+            {t("home.des3")}
             </h2>
             <p className="mt-3 text-xl text-gray-500 sm:mt-4">
-              Numbers from 2020
+            {t("home.des4")}
             </p>
           </div>
         </div>
@@ -231,9 +241,9 @@ export default function HomePage() {
       <div className="bg-white">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
-            <h2 className="text-base text-primary font-semibold tracking-wide uppercase">Categories</h2>
+            <h2 className="text-base text-primary font-semibold tracking-wide uppercase">{t("home.categories")}</h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Community Help Campaigns
+            {t("home.des5")}
             </p>
           </div>
 
@@ -283,14 +293,14 @@ export default function HomePage() {
       </div>
       
       {/* Featured Organizations */}
-      <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+      {/* <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Featured Organizations and Individuals
+            {t("home.des6")}
             </h2>
             <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-              Individuals and organizations creating positive change
+            {t("home.des7")}
             </p>
           </div>
 
@@ -304,27 +314,63 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
+      <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+  <div className="max-w-7xl mx-auto">
+    <div className="text-center">
+      <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+        Featured Organizations and Individuals
+      </h2>
+      <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+        Individuals and organizations creating positive change
+      </p>
+    </div>
+
+    <div className="mt-12 max-w-lg mx-auto grid gap-8 lg:grid-cols-3 lg:max-w-none">
+      {topOrganizations.map((org, index) => (
+        <div key={org.id} className="bg-white shadow-lg rounded-lg p-6">
+          <img
+            src={org.profile_image}
+            alt={org.full_name}
+            className="h-16 w-16 rounded-full mx-auto"
+          />
+          <h3 className="mt-4 text-lg font-bold text-center">{org.full_name}</h3>
+          <p className="mt-2 text-sm text-gray-500 text-center">{org.bio}</p>
+          <p className="mt-4 text-center text-primary font-semibold">
+            Raised: ${[1589000, 2890000, 3670000][index].toLocaleString()}
+          </p>
+          <div className="mt-4 text-center">
+            <Link href={`/organizations/${org.id}`}>
+              <Button size="sm" variant="outline" className="text-primary">
+                View Detail
+              </Button>
+            </Link>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
       
       {/* CTA Section */}
       <div className="bg-primary">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            <span className="block">Ready to donate?</span>
-            <span className="block text-blue-100">Join us today.</span>
+            <span className="block">{t("home.des8")}</span>
+            <span className="block text-blue-100">{t("home.des9")}</span>
           </h2>
           <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
             <div className="inline-flex rounded-md shadow">
               <Link href="/auth">
                 <Button size="lg" variant="secondary" className="text-primary bg-white hover:bg-blue-50">
-                  Create Account
+                {t("nav.signup")}
                 </Button>
               </Link>
             </div>
             <div className="ml-3 inline-flex rounded-md shadow">
               <Link href="/about">
                 <Button size="lg" variant="default" className="bg-blue-600 hover:bg-blue-700">
-                  Learn More
+                {t("footer.about")}
                 </Button>
               </Link>
             </div>

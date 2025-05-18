@@ -35,6 +35,9 @@ app.use((req, res, next) => {
 
   next();
 });
+(async () => {
+  await import("./database/connection");
+})();
 
 (async () => {
   const server = await registerRoutes(app);

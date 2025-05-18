@@ -5,6 +5,7 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
+//import { storage } from "./service";
 import { User as SelectUser } from "@shared/schema";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
@@ -196,10 +197,25 @@ export function setupAuth(app: Express) {
   });
 
   // Get current user
-  app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-    // Return user without the password
-    const { password, ...userWithoutPassword } = req.user;
-    res.json(userWithoutPassword);
-  });
+    // API mới để lấy thông tin người dùng
+    app.get("/api/user", async (req, res) => {
+      try {
+        if (!req.isAuthenticated() || !req.user) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+  
+        // Lấy thông tin người dùng từ cơ sở dữ liệu
+        const user = await storage.getUser(req.user.id);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+  
+        // Loại bỏ mật khẩu trước khi trả về
+        const { password, ...userWithoutPassword } = user;
+        res.status(200).json(userWithoutPassword);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+    });
 }
