@@ -68,8 +68,8 @@ export class DatabaseStorage implements IStorage {
   //   return prisma.campaign.create({ data:  });
   // }
   async createCampaign(campaign: InsertCampaign) {
-  return prisma.campaign.create({ data: campaign });
-}
+    return prisma.campaign.create({ data: campaign });
+  }
 
 
   async updateCampaign(id: number, campaign: Partial<Campaign>) {
@@ -116,7 +116,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Stats
-  async getStats() {const totalProjects = await prisma.campaign.count();
+  async getStats() {
+    const totalProjects = await prisma.campaign.count();
     const totalDonors = await prisma.user.count({ where: { userType: "donor" } });
     const totalDonated = await prisma.donation.aggregate({ _sum: { amount: true } });
 
@@ -125,6 +126,22 @@ export class DatabaseStorage implements IStorage {
       totalDonors,
       totalDonated: totalDonated._sum.amount || 0,
     };
+  }
+  async linkCampaignCategories(campaignId: number, categoryIds: number[]) {
+    // Xóa các liên kết cũ (nếu muốn update hoàn toàn)
+    await prisma.campaignCategory.deleteMany({
+      where: { campaignId },
+    });
+
+    // Tạo liên kết mới
+    const links = categoryIds.map((categoryId) => ({
+      campaignId,
+      categoryId,
+    }));
+
+    await prisma.campaignCategory.createMany({
+      data: links,
+    });
   }
 }
 

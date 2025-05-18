@@ -26,36 +26,44 @@ model User {
   @@map("users") // <- ánh xạ model User sang bảng users
 }
 
-model Category {
-  id            Int        @id @default(autoincrement())
-  name          String     @unique
-  description   String
-  imageUrl      String
-  campaignCount Int        @default(0)
-  campaigns     Campaign[]
-}
-
 model Campaign {
-  id             Int       @id @default(autoincrement())
-  title          String
-  description    String
-  goalAmount     Float
-  currentAmount  Float     @default(0)
-  categoryId     Int
-  category       Category  @relation(fields: [categoryId], references: [id])
-
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String
   organizationId Int
+  goalAmount   Float
+  currentAmount Float    @default(0)
+  imageUrl     String?
+  startDate    DateTime
+  endDate      DateTime?
+  isActive     Boolean   @default(true)
+  isApproved   Boolean   @default(false)
+  createdAt    DateTime  @default(now())
   organization   User      @relation("OrganizationCampaigns", fields: [organizationId], references: [id])
-
-  imageUrl       String
-  startDate      DateTime
-  endDate        DateTime
-  createdAt      DateTime  @default(now())
-  isActive       Boolean   @default(true)
-  isApproved     Boolean   @default(false)
-
-  donations      Donation[]
+  categories   CampaignCategory[]
+  donations    Donation[]
 }
+
+model Category {
+  id           Int       @id @default(autoincrement())
+  name         String    @unique
+  description  String?
+  imageUrl     String?
+  campaignCount Int      @default(0)
+
+  campaigns    CampaignCategory[]
+}
+
+model CampaignCategory {
+  campaignId Int
+  categoryId Int
+
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([campaignId, categoryId])
+}
+
 
 model Donation {
   id          Int      @id @default(autoincrement())
