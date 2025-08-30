@@ -1,49 +1,66 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { User } from "@shared/schema";
-import { Link } from "wouter";
+// import { Card } from "@/components/ui/card";
+// export default function OrganizationCard({ organization }) {
+//   const { fullName, bio, website, profileImage } = organization;
 
-interface OrganizationCardProps {
-  organization: User;
-  raisedAmount?: number;
-}
+// return (
+//   <div className="border rounded-lg p-4 bg-white shadow-md flex flex-col items-center">
+//     <img
+//       src={profileImage }
+//       alt={fullName}
+//       className="w-24 h-24 rounded-full object-cover mb-4"
+//     />
+//     <h2 className="text-xl font-semibold mb-2">{fullName}</h2>
+//     <p className="text-gray-600 mb-4">{bio}</p>
+//     {website && (
+//       <a
+//         href={website}
+//         target="_blank"
+//         rel="noopener noreferrer"
+//         className="text-blue-500 hover:underline"
+//       >
+//         Visit Website
+//       </a>
+//     )}
+//   </div>
+// );
+// }
 
-export function OrganizationCard({ organization, raisedAmount = 0 }: OrganizationCardProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
-  };
+
+
+
+import { useLocation } from "wouter";
+import { Card } from "@/components/ui/card";
+
+export default function OrganizationCard({ organization }) {
+  const { id, fullName, bio, website, profileImage } = organization;
+  const [, navigate] = useLocation();
 
   return (
-    <div className="flex flex-col rounded-lg shadow-lg overflow-hidden">
-      <div className="flex-shrink-0 h-48 w-full object-cover">
-        <img 
-          className="h-48 w-full object-cover" 
-          src={organization.profileImage || "https://images.unsplash.com/photo-1537511446984-935f663eb1f4"} 
-          alt={organization.fullName} 
-        />
-      </div>
-      <div className="flex-1 bg-white p-6 flex flex-col justify-between">
-        <div className="flex-1">
-          <Link href={`/organizations/${organization.id}`} className="block">
-            <p className="text-xl font-semibold text-gray-900">{organization.fullName}</p>
-            <p className="mt-1 text-base text-gray-500">{organization.bio || "Organization Leader"}</p>
-          </Link>
-          <p className="mt-3 text-base text-gray-500">
-            Has raised {formatCurrency(raisedAmount)}
-          </p>
-        </div>
-        <div className="mt-6">
-          <Link href={`/organizations/${organization.id}`} className="text-primary hover:text-blue-600">
-            View Details <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-      </div>
+    <div
+      className="border rounded-lg p-4 bg-white shadow-md flex flex-col items-center cursor-pointer hover:shadow-lg transition"
+      onClick={() => navigate(`/organization-page/${id}`)}
+      role="button"
+      tabIndex={0}
+      onKeyPress={e => { if (e.key === "Enter") navigate(`/organization-page/${id}`); }}
+    >
+      <img
+        src={profileImage}
+        alt={fullName}
+        className="w-24 h-24 rounded-full object-cover mb-4"
+      />
+      <h2 className="text-xl font-semibold mb-2">{fullName}</h2>
+      <p className="text-gray-600 mb-4">{bio}</p>
+      {website && (
+        <a
+          href={website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:underline"
+          onClick={e => e.stopPropagation()}
+        >
+          Visit Website
+        </a>
+      )}
     </div>
   );
 }
-
-export default OrganizationCard;

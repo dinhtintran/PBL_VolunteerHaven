@@ -4,13 +4,15 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertCampaignSchema, insertDonationSchema, insertCategorySchema } from "@shared/schema";
-
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
 
   // Get all campaigns
   app.get("/api/campaigns", async (req, res) => {
+
     try {
       const campaigns = await storage.getAllCampaigns();
       res.json(campaigns);
@@ -18,6 +20,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error fetching campaigns" });
     }
   });
+
+  app.get("/api/organizations", async (req, res) => {
+  try {
+    const organizations = await storage.getAllOrganizations(); // lấy từ hàm mới
+    res.json(organizations); // trả kết quả
+  } catch (error) {
+    console.error("Error fetching organizations:", error);
+    res.status(500).json({ message: "Error fetching organizations" });
+    console.log("Organizations:", organizations);
+    console.log(organizations);
+
+  }
+});
+
 
   // Get featured campaigns
   app.get("/api/campaigns/featured", async (req, res) => {
@@ -35,63 +51,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const campaign = await storage.getCampaign(id);
-      
+
       if (!campaign) {
         return res.status(404).json({ message: "Campaign not found" });
       }
-      
+
       res.json(campaign);
     } catch (error) {
       res.status(500).json({ message: "Error fetching campaign" });
     }
   });
 
-  // Create campaign (protected)
   app.post("/api/campaigns", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "You must be logged in to create a campaign" });
-    }
-    
     try {
-      const user = req.user;
-      
-      if (user.userType !== "organization") {
-        return res.status(403).json({ message: "Only organizations can create campaigns" });
+      const {
+        title,
+        description,
+        goalAmount,
+        organizationId,
+        imageUrl,
+        startDate,
+        endDate,
+        categoryIds // Mảng category IDs
+      } = req.body;
+
+      if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+        return res.status(400).json({
+          message: "Invalid campaign data",
+          errors: [{
+            code: "invalid_type",
+            expected: "array of integers",
+            received: typeof categoryIds,
+            path: ["categoryIds"],
+            message: "At least one category is required"
+          }]
+        });
       }
-      
-      const campaignData = insertCampaignSchema.parse({
-        ...req.body,
-        organizationId: user.id
+
+      // Tạo campaign (chưa liên kết categories)
+      const campaign = await prisma.campaign.create({
+        data: {
+          title,
+          description,
+          goalAmount,
+          organizationId,
+          imageUrl,
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+        }
       });
-      
-      const campaign = await storage.createCampaign(campaignData);
-      res.status(201).json(campaign);
+
+      // Tạo liên kết campaign-category trong bảng trung gian
+      const campaignCategoryCreates = categoryIds.map(categoryId =>
+        prisma.campaignCategory.create({
+          data: {
+            campaignId: campaign.id,
+            categoryId
+          }
+        })
+      );
+
+      await Promise.all(campaignCategoryCreates);
+
+      // Lấy lại campaign với categories để trả về client
+      const campaignWithCategories = await prisma.campaign.findUnique({
+        where: { id: campaign.id },
+        include: { categories: true }
+      });
+
+      res.status(201).json(campaignWithCategories);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid campaign data", errors: error.errors });
-      }
-      res.status(500).json({ message: "Error creating campaign" });
+      console.error("Error creating campaign:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   });
+
 
   // Update campaign (protected)
   app.patch("/api/campaigns/:id", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "You must be logged in to update a campaign" });
     }
-    
+
     try {
       const id = parseInt(req.params.id);
       const campaign = await storage.getCampaign(id);
-      
+
       if (!campaign) {
         return res.status(404).json({ message: "Campaign not found" });
       }
-      
+
       if (campaign.organizationId !== req.user.id) {
         return res.status(403).json({ message: "You can only update your own campaigns" });
       }
-      
+
       const updatedCampaign = await storage.updateCampaign(id, req.body);
       res.json(updatedCampaign);
     } catch (error) {
@@ -104,19 +157,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "You must be logged in to delete a campaign" });
     }
-    
+
     try {
       const id = parseInt(req.params.id);
       const campaign = await storage.getCampaign(id);
-      
+
       if (!campaign) {
         return res.status(404).json({ message: "Campaign not found" });
       }
-      
+
       if (campaign.organizationId !== req.user.id) {
         return res.status(403).json({ message: "You can only delete your own campaigns" });
       }
-      
+
       await storage.deleteCampaign(id);
       res.status(204).send();
     } catch (error) {
@@ -161,19 +214,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "You must be logged in to make a donation" });
     }
-    
+
     try {
       const donationData = insertDonationSchema.parse({
         ...req.body,
         donorId: req.user.id
       });
-      
+
       // Check if campaign exists
       const campaign = await storage.getCampaign(donationData.campaignId);
       if (!campaign) {
         return res.status(404).json({ message: "Campaign not found" });
       }
-      
+
       // Create donation
       const donation = await storage.createDonation(donationData);
       res.status(201).json(donation);
@@ -190,11 +243,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const campaign = await storage.getCampaign(id);
-      
+
       if (!campaign) {
         return res.status(404).json({ message: "Campaign not found" });
       }
-      
+
       const donations = await storage.getDonationsByCampaign(id);
       res.json(donations);
     } catch (error) {
@@ -207,7 +260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "You must be logged in to view your donations" });
     }
-    
+
     try {
       const donations = await storage.getDonationsByUser(req.user.id);
       res.json(donations);
@@ -231,7 +284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "You must be logged in to view your profile" });
     }
-    
+
     try {
       const user = req.user;
       res.json(user);
@@ -245,34 +298,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "You must be logged in to update your profile" });
     }
-    
+
     try {
       const updates = req.body;
-      
+
       // Don't allow changing username, email, or userType through this endpoint
       delete updates.username;
       delete updates.email;
       delete updates.userType;
       delete updates.password;
-      
+
       const updatedUser = await storage.updateUser(req.user.id, updates);
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ message: "Error updating profile" });
     }
   });
+  app.get("/api/organizations/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const organization = await storage.getOrganizationById(parseInt(id, 10));
 
+      if (!organization) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+
+      res.json(organization);
+    } catch (error) {
+      console.error("Error fetching organization:", error);
+      res.status(500).json({ message: "Error fetching organization" });
+    }
+  });
   // ADMIN ROUTES
   // Middleware to check if user is admin
   const isAdmin = (req: any, res: any, next: any) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "You must be logged in" });
     }
-    
+
     if (req.user.userType !== "admin") {
       return res.status(403).json({ message: "You must be an admin to access this resource" });
     }
-    
+
     next();
   };
 
@@ -301,15 +368,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const user = await storage.getUser(id);
-      
+
       if (!user) {
         return res.status(404).json({ message: "Organization not found" });
       }
-      
+
       if (user.userType !== "organization") {
         return res.status(400).json({ message: "User is not an organization" });
       }
-      
+
       const updatedUser = await storage.updateUser(id, { isApproved: true });
       res.json(updatedUser);
     } catch (error) {
@@ -322,15 +389,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const user = await storage.getUser(id);
-      
+
       if (!user) {
         return res.status(404).json({ message: "Organization not found" });
       }
-      
+
       if (user.userType !== "organization") {
         return res.status(400).json({ message: "User is not an organization" });
       }
-      
+
       const updatedUser = await storage.updateUser(id, { isApproved: false });
       res.json(updatedUser);
     } catch (error) {
@@ -343,11 +410,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const campaign = await storage.getCampaign(id);
-      
+
       if (!campaign) {
         return res.status(404).json({ message: "Campaign not found" });
       }
-      
+
       const updatedCampaign = await storage.updateCampaign(id, { isApproved: true });
       res.json(updatedCampaign);
     } catch (error) {
@@ -360,11 +427,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const campaign = await storage.getCampaign(id);
-      
+
       if (!campaign) {
         return res.status(404).json({ message: "Campaign not found" });
       }
-      
+
       const updatedCampaign = await storage.updateCampaign(id, { isApproved: false, isActive: false });
       res.json(updatedCampaign);
     } catch (error) {

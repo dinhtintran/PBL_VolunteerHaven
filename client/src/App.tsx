@@ -9,12 +9,15 @@ import CampaignPage from "@/pages/campaign-page";
 import CampaignDetails from "@/pages/campaign-details";
 import DashboardPage from "@/pages/dashboard-page";
 import OrganizationPage from "@/pages/organization-page";
+import OrganizationTest from "@/pages/organization-test";
 import CreateCampaign from "@/pages/create-campaign";
 import AdminPage from "@/pages/admin-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { LanguageProvider } from "@/hooks/use-language";
 import { ProtectedRoute } from "@/lib/protected-route";
-
+import About from "@/pages/about-page";
+import Contact from "@/pages/contact-page";
+import EditProfile from "@/pages/edit-profile-page";
 function Router() {
   return (
     <Switch>
@@ -23,8 +26,12 @@ function Router() {
       <Route path="/campaigns" component={CampaignPage} />
       <Route path="/campaigns/:id" component={CampaignDetails} />
       <Route path="/organizations/:id" component={OrganizationPage} />
+      <Route path="/organizations" component={OrganizationTest} />
+       <Route path="/about" component={About} />
+      <Route path="/contact" component={Contact} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/create-campaign" component={CreateCampaign} />
+      <Route path="/edit-profile" component={EditProfile} />
       <ProtectedRoute path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>

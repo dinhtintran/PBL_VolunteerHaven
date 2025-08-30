@@ -37,6 +37,9 @@ export function Navbar() {
               <Link href="/" className={`${isActive('/') ? 'border-b-2 border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} px-1 pt-1 inline-flex items-center text-sm font-medium`}>
                 {t('nav.home')}
               </Link>
+              <Link href="/organizations" className={`${isActive('/organizations') ? 'border-b-2 border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} px-1 pt-1 inline-flex items-center text-sm font-medium`}>
+                Tổ chức
+              </Link>
               <Link href="/campaigns" className={`${isActive('/campaigns') ? 'border-b-2 border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} px-1 pt-1 inline-flex items-center text-sm font-medium`}>
                 {t('nav.campaigns')}
               </Link>
@@ -57,9 +60,13 @@ export function Navbar() {
 
             {user ? (
               <div className="ml-4 flex items-center space-x-2">
+                <Link href="/create-campaign">
+                  <Button variant="default" size="sm">Tạo chiến dịch</Button>
+                </Link>
                 <Link href="/dashboard">
                   <Button variant="outline" size="sm">{t("nav.dashboard")}</Button>
                 </Link>
+                
                 {user.userType === "admin" && (
                   <Link href="/admin">
                     <Button variant="outline" size="sm">{t("nav.admin")}</Button>
@@ -70,10 +77,10 @@ export function Navbar() {
             ) : (
               <div className="ml-4 flex items-center space-x-2">
                 <Link href="/auth">
-                  <Button variant="default" size="sm">{t("nav.login")}</Button>
+                  <Button variant="default" size="sm">Tạo chiến dịch</Button>
                 </Link>
                 <Link href="/auth">
-                  <Button variant="outline" size="sm">{t("nav.signup")}</Button>
+                  <Button variant="outline" size="sm">{t("nav.login")}</Button>
                 </Link>
               </div>
             )}

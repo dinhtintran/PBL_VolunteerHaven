@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  email        String   @unique
+  password     String
+  fullName     String
+  userType     String
+  bio          String?
+  profileImage String?
+  isApproved   Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  
+  campaigns    Campaign[] @relation("OrganizationCampaigns")
+  donations    Donation[] @relation("UserDonations")
+
+  @@map("users") // <- ánh xạ model User sang bảng users
+}
+
+model Campaign {
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String
+  organizationId Int
+  goalAmount   Float
+  currentAmount Float    @default(0)
+  imageUrl     String?
+  startDate    DateTime
+  endDate      DateTime?
+  isActive     Boolean   @default(true)
+  isApproved   Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  organization   User      @relation("OrganizationCampaigns", fields: [organizationId], references: [id])
+  categories   CampaignCategory[]
+  donations    Donation[]
+}
+
+model Category {
+  id           Int       @id @default(autoincrement())
+  name         String    @unique
+  description  String?
+  imageUrl     String?
+  campaignCount Int      @default(0)
+
+  campaigns    CampaignCategory[]
+}
+
+model CampaignCategory {
+  campaignId Int
+  categoryId Int
+
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([campaignId, categoryId])
+}
+
+
+model Donation {
+  id          Int      @id @default(autoincrement())
+  campaignId  Int
+  donorId     Int
+  amount      Float
+  message     String?
+  isAnonymous Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  campaign    Campaign @relation(fields: [campaignId], references: [id])
+  donor       User     @relation("UserDonations", fields: [donorId], references: [id])
+}
